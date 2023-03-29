@@ -1,3 +1,5 @@
+require_relative './colors.rb'
+
 class Board
 
     attr_accessor :board
@@ -22,26 +24,33 @@ class Board
     end
 
     def set_initial_pos(letter, num)
-        return 'pawn' if num == 2 || num == 7
-        return 'empty' if num > 2 && num < 7
+        num == 1 || num == 2 ? color = '_white' : color = '_black'
+
+        return 'pawn' + color if num == 2 || num == 7
+        return 'empty' + color if num > 2 && num < 7
 
         case letter
         when 'a'
-            return 'rook'
+            return 'rook' + color
         when 'b'
-            return 'knight'
+            return 'knight' + color
         when 'c'
-            return 'bishop'
+            return 'bishop' + color
         when 'd'
-            return 'queen'
+            return 'queen' + color
         when 'e'
-            return 'king'
+            return 'king' + color
         when 'f'
-            return 'bishop'
+            return 'bishop' + color
         when 'g'
-            return 'knight'
+            return 'knight' + color
         when 'h'
-            return 'rook'
+            return 'rook' + color
         end
+    end
+
+    def modify_board(old_pos, new_pos)
+        #set old position to empty and new position to the piece
+        
     end
 end
