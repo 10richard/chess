@@ -1,8 +1,13 @@
 require_relative './colors.rb'
+require_relative './move_set//piece.rb'
 
-class Board
+class Board < Piece
 
     attr_accessor :board
+
+    #piece order = [pawn, knight, bishop, rook, queen, king]
+    @@white_pieces = ['♟︎', '♞', '♝', '♜', '♛', '♚']
+    @@black_pieces = ['♙', '♘', '♗', '♖', '♕', '♔']
 
     def initialize
         @board = generate_board
@@ -24,33 +29,60 @@ class Board
     end
 
     def set_initial_pos(letter, num)
-        num == 1 || num == 2 ? color = '_white' : color = '_black'
-
-        return 'pawn' + color if num == 2 || num == 7
-        return 'empty' + color if num > 2 && num < 7
-
+        num == 1 || num == 2 ? color = 'white' : color = 'black'
+        
+        return set_piece_color('pawn', color) if num == 2 || num == 7
+        return ' ' if num > 2 && num < 7
+        #replace names of pieces with images/emojis
         case letter
-        when 'a'
-            return 'rook' + color
-        when 'b'
-            return 'knight' + color
-        when 'c'
-            return 'bishop' + color
+        when 'a', 'h'
+            return set_piece_color('rook', color)
+        when 'b', 'g'
+            return set_piece_color('knight', color)
+        when 'c', 'f'
+            return set_piece_color('bishop', color)
         when 'd'
-            return 'queen' + color
+            return set_piece_color('queen', color)
         when 'e'
-            return 'king' + color
-        when 'f'
-            return 'bishop' + color
-        when 'g'
-            return 'knight' + color
-        when 'h'
-            return 'rook' + color
+            return set_piece_color('king', color)
+        end
+    end
+
+    def set_piece_color(piece, color)
+        #sets color of piece when generating board
+
+        #decides current set of pieces based on color
+        color == 'white' ? set = @@white_pieces : set = @@black_pieces
+
+        case piece
+        when 'pawn'
+            return set[0]
+        when 'knight'
+            return set[1]
+        when 'bishop'
+            return set[2]
+        when 'rook'
+            return set[3]
+        when 'queen'
+            return set[4]
+        when 'king'
+            return set[5]
         end
     end
 
     def modify_board(old_pos, new_pos)
         #set old position to empty and new position to the piece
+        #^moves chess pieces on the board
         
+    end
+
+    def get_piece(pos)
+        @board[pos[0]][pos[1]]
+    end
+
+    def get_piece_color(pos)
+        #gets color of selected piece
+        piece = @board[pos[0]][pos[1]]
+        @@white_pieces.include?(piece) ? 'white' : 'black'
     end
 end
