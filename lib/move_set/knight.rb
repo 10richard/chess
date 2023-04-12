@@ -1,3 +1,3 @@
-class Knight  < Piece
+class Knight < Piece
 
 end

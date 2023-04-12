@@ -1,3 +1,3 @@
-class Rook  < Piece
+class Rook < Piece
     
 end
