@@ -12,10 +12,25 @@ module Display
         
         #flips board if current turn is white
         pieces.each_with_index {|row, i| pieces[i] = row.reverse} if current == 'white'
+
+        #sets the numbers and letters on the sides of the chess board (coordinates)
+        board_nums = set_board_nums(current)
+        board_letters = set_board_letters(current)
     
         for num in 0..7 do
-            p pieces.map{|row| row[num]}.join(' ')
+            puts "#{board_nums[num]} #{pieces.map {|row| row[num]}.join(' ')}"
+            puts '  ' +  board_letters.join(' ') if num == 7
         end
+    end
+
+    def set_board_nums(color)
+        nums = (1..8).to_a
+        color == 'white' ? nums.reverse : nums
+    end
+
+    def set_board_letters(color)
+        letters = ('a'..'h').to_a
+        color == 'white' ? letters : letters.reverse
     end
 
     def get_player_move(msg, piece=nil)
