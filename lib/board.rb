@@ -1,5 +1,4 @@
-require_relative './colors.rb'
-require_relative './move_set//piece.rb'
+require_relative './move_set/piece.rb'
 
 class Board < Piece
 
@@ -84,5 +83,15 @@ class Board < Piece
         #gets color of selected piece
         piece = @board[pos[0]][pos[1]]
         @@white_pieces.include?(piece) ? 'white' : 'black'
+    end
+
+    def valid_moves?(piece)
+        #will get valid_moves of selected piece from Piece class
+
+    end
+
+    def initialize_piece(piece)
+        #will create an instance for the piece w/initial position, board and color
+
     end
 end
