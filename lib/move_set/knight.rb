@@ -25,8 +25,7 @@ class Knight < Piece
 
     def position_capturable?(pos)
         capturable = white? ? @@black_pieces : @@white_pieces
-        return true if @board[pos[0]][pos[1]] == '-'
-        return true if capturable.include?(@board[pos[0]][pos[1]])
+        return true if @board[pos[0]][pos[1]] == '-' || capturable.include?(@board[pos[0]][pos[1]])
         false
     end
 end
