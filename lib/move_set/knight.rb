@@ -15,12 +15,8 @@ class Knight < Piece
             num = @initial_pos[1].to_i
             letter = (letter.ord + t[0]).chr
             num = (num + t[1]).to_s
-            @valid_moves.push(letter + num.to_s) if on_board?(letter) && on_board?(num) && position_capturable?(letter + num)
+            @valid_moves.push(letter + num.to_s) if on_board?(letter + num) && position_capturable?(letter + num)
         end
-    end
-
-    def on_board?(part)
-        @nums.include?(part) || @letters.include?(part)
     end
 
     def position_capturable?(pos)
