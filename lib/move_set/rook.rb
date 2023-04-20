@@ -1,7 +1,8 @@
 class Rook < Piece
 
     def find_valid_moves
-
+        horizontal
+        vertical
     end
 
     def horizontal
