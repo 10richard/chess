@@ -1,7 +1,10 @@
 class Bishop < Piece
 
     def find_valid_moves
-
+        diagonal_moves_quadrant_one
+        diagonal_moves_quadrant_two
+        diagonal_moves_quadrant_three
+        diagonal_moves_quadrant_four
     end
 
 
@@ -11,13 +14,13 @@ class Bishop < Piece
         num = @initial_pos[1]
         capturable = white? ? @@black_pieces : @@white_pieces
 
-        while @letters.include?(letter) && @nums.include?(num) && @board[letter][num] == '-'
+        while on_board?(letter + num) && @board[letter][num] == '-'
             #gets previous letter in alphabet
             letter = (letter.ord - 1).chr
             num = num.to_i
             num -= 1
             num = num.to_s
-            @valid_moves.push(letter + num) if !@letters.include?(letter) || !@nums.include?(num)
+            @valid_moves.push(letter + num) if on_board?(letter + num)
         end
         @valid_moves.pop unless capturable.include?(@board[letter][num])
     end
@@ -27,13 +30,13 @@ class Bishop < Piece
         num = @initial_pos[1]
         capturable = white? ? @@black_pieces : @@white_pieces
 
-        while @letters.include?(letter) && @nums.include?(num) && @board[letter][num] == '-'
+        while on_board?(letter + num) && @board[letter][num] == '-'
             #gets previous letter in alphabet
             letter = (letter.ord + 1).chr
             num = num.to_i
             num -= 1
             num = num.to_s
-            @valid_moves.push(letter + num) if !@letters.include?(letter) || !@nums.include?(num)
+            @valid_moves.push(letter + num) if on_board?(letter + num)
         end
         @valid_moves.pop unless capturable.include?(@board[letter][num])
     end
@@ -43,11 +46,11 @@ class Bishop < Piece
         num = @initial_pos[1]
         capturable = white? ? @@black_pieces : @@white_pieces
 
-        while @letters.include?(letter) && @nums.include?(num) && @board[letter][num] == '-'
+        while on_board?(letter + num) && @board[letter][num] == '-'
             #gets next letter in alphabet
             letter = (letter.ord + 1).chr
             num.next!
-            @valid_moves.push(letter + num) if !@letters.include?(letter) || !@nums.include?(num)
+            @valid_moves.push(letter + num) if on_board?(letter + num)
         end
         @valid_moves.pop unless capturable.include?(@board[letter][num])
     end
@@ -58,11 +61,11 @@ class Bishop < Piece
         num = @initial_pos[1]
         capturable = white? ? @@black_pieces : @@white_pieces
 
-        while @letters.include?(letter) && @nums.include?(num) && @board[letter][num] == '-'
+        while on_board?(letter + num) && @board[letter][num] == '-'
             #gets previous letter in alphabet
             letter = (letter.ord - 1).chr
             num.next!
-            @valid_moves.push(letter + num) if !@letters.include?(letter) || !@nums.include?(num)
+            @valid_moves.push(letter + num) if on_board?(letter + num)
         end
         @valid_moves.pop unless capturable.include?(@board[letter][num])
     end
