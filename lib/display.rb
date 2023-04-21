@@ -30,7 +30,7 @@ module Display
 
     def set_board_letters(color)
         letters = ('a'..'h').to_a
-        color == 'white' ? letters : letters.reverse
+        #color == 'white' ? letters : letters.reverse
     end
 
     def get_player_move(msg, piece=nil)
@@ -51,8 +51,9 @@ module Display
         {
             'invalid_color' => "Selected the wrong color, you are #{current}",
             'invalid_pos' => "The position you entered does not exist",
-            'invalid_new_pos' => "",
-            'empty_pos' => 'The position you entered is empty'
+            'invalid_new_pos' => "You cannot move the piece there",
+            'empty_pos' => 'The position you entered is empty',
+            'in_check' => 'You are in check!'
         }[msg]
     end
 
