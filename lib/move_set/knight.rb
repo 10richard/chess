@@ -1,16 +1,17 @@
-class Knight < Piece
+require_relative './piece.rb'
 
-    def initialize
-        @transformations = [[-2, -1], [-1, -2], [-2, 1], [-1, 2], 
-        [1, 2], [2, 1], [2, -1], [1, -2]].freeze
-    end
+class Knight < Piece
 
     def find_valid_moves
         flower_pattern
+        @valid_moves
     end
 
     def flower_pattern
-        @transformations.each do |t|
+        transformations = [[-2, -1], [-1, -2], [-2, 1], [-1, 2], 
+        [1, 2], [2, 1], [2, -1], [1, -2]].freeze
+
+        transformations.each do |t|
             letter = @initial_pos[0]
             num = @initial_pos[1].to_i
             letter = (letter.ord + t[0]).chr
@@ -21,7 +22,7 @@ class Knight < Piece
 
     def position_capturable?(pos)
         capturable = white? ? @@black_pieces : @@white_pieces
-        return true if @board[pos[0]][pos[1]] == '-' || capturable.include?(@board[pos[0]][pos[1]])
+        return true if @board.board[pos[0]][pos[1]] == '-' || capturable.include?(@board.board[pos[0]][pos[1]])
         false
     end
 end
