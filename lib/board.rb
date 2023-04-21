@@ -1,4 +1,10 @@
 require_relative './move_set/piece.rb'
+require_relative './move_set/pawn.rb'
+require_relative './move_set/bishop.rb'
+require_relative './move_set/knight.rb'
+require_relative './move_set/king.rb'
+require_relative './move_set/rook.rb'
+require_relative './move_set/queen.rb'
 
 class Board < Piece
 
@@ -31,7 +37,7 @@ class Board < Piece
         num == 1 || num == 2 ? color = 'white' : color = 'black'
         
         return set_piece_color('pawn', color) if num == 2 || num == 7
-        return ' ' if num > 2 && num < 7
+        return '-' if num > 2 && num < 7
         #replace names of pieces with images/emojis
         case letter
         when 'a', 'h'
@@ -72,7 +78,10 @@ class Board < Piece
     def modify_board(old_pos, new_pos)
         #set old position to empty and new position to the piece
         #^moves chess pieces on the board
-        
+        #account for castling with king later on
+        piece = get_piece(old_pos)
+        @board[old_pos[0]][old_pos[1]] = '-'
+        @board[new_pos[0]][new_pos[1]] = piece
     end
 
     def get_piece(pos)
@@ -85,13 +94,21 @@ class Board < Piece
         @@white_pieces.include?(piece) ? 'white' : 'black'
     end
 
-    def valid_moves?(piece)
-        #will get valid_moves of selected piece from Piece class
-
-    end
-
-    def initialize_piece(piece)
+    def valid_moves?(pos, piece, color, board)
         #will create an instance for the piece w/initial position, board and color
-
+        case piece
+        when '♟︎', '♙'
+            return Pawn.new(board, pos, color).find_valid_moves
+        when '♞', '♘'
+            return Knight.new(board, pos, color).find_valid_moves
+        when '♝', '♗'
+            initialize_piece = Bishop.new(@board, pos, color).find_valid_moves
+        when '♜', '♖'
+            initialize_piece = Rook.new(@board, pos, color).find_valid_moves
+        when '♛', '♕'
+            initialize_piece = Queen.new(@board, pos, color).find_valid_moves
+        when '♚', '♔'
+            initialize_piece = King.new(@board, pos, color).find_valid_moves
+        end
     end
 end
