@@ -42,7 +42,6 @@ class Pawn < Piece
             num = @initial_pos[1]
             letter = (letter.ord + t[0]).chr
             num = (num.ord + t[1]).chr
-            puts letter + num
             @valid_moves.push(letter + num) if on_board?(letter + num) && capturable.include?(@board.board[letter][num])
         end
     end
