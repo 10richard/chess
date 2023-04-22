@@ -1,3 +1,5 @@
+require_relative './piece.rb'
+
 class Queen < Piece
     
     def find_valid_moves
@@ -7,6 +9,7 @@ class Queen < Piece
         diagonal_moves_quadrant_two
         diagonal_moves_quadrant_three
         diagonal_moves_quadrant_four
+        @valid_moves
     end
 
     #add rook and bishop methods
@@ -15,21 +18,25 @@ class Queen < Piece
         num = @initial_pos[1]
         capturable = white? ? @@black_pieces : @@white_pieces
 
-        while @letters.include?(letter) && @board[letter][num] == '-'
-            #gets previous letter in alphabet
+        loop do
+            #gets next letter in alphabet
             letter = (letter.ord - 1).chr
-            @valid_moves.push(letter + num) if @letters.include?(letter)
+            @valid_moves.push(letter + num)
+
+            break unless @letters.include?(letter) && @board.board[letter][num] == '-'
         end
-        @valid_moves.pop unless capturable.include?(@board[letter][num])
+        @valid_moves.pop unless on_board?(letter + num) && capturable.include?(@board.board[letter][num])
 
         letter = @initial_pos[0]
 
-        while @letters.include?(letter) && @board[letter][num] == '-'
-            #gets previous letter in alphabet
+        loop do
+            #gets next letter in alphabet
             letter = (letter.ord + 1).chr
-            @valid_moves.push(letter + num) if @letters.include?(letter)
+            @valid_moves.push(letter + num)
+
+            break unless @letters.include?(letter) && @board.board[letter][num] == '-'
         end
-        @valid_moves.pop unless capturable.include?(@board[letter][num])
+        @valid_moves.pop unless on_board?(letter + num) && capturable.include?(@board.board[letter][num])
     end
 
     def vertical
@@ -37,41 +44,47 @@ class Queen < Piece
         num = @initial_pos[1]
         capturable = white? ? @@black_pieces : @@white_pieces
 
-        while @nums.include?(num) && @board[letter][num] == '-'
-            #gets previous letter in alphabet
+        loop do
+            #gets next letter in alphabet
             num = num.to_i
             num -= 1
             num = num.to_s
-            @valid_moves.push(letter + num) if @nums.include?(num)
+            @valid_moves.push(letter + num)
+
+            break unless @nums.include?(num) && @board.board[letter][num] == '-'
         end
-        @valid_moves.pop unless capturable.include?(@board[letter][num])
+        @valid_moves.pop unless on_board?(letter + num) && capturable.include?(@board.board[letter][num])
 
         num = @initial_pos[1]
 
-        while @nums.include?(num) && @board[letter][num] == '-'
-            #gets previous letter in alphabet
+        loop do
+            #gets next letter in alphabet
             num = num.to_i
             num += 1
             num = num.to_s
-            @valid_moves.push(letter + num) if @nums.include?(num)
+            @valid_moves.push(letter + num)
+
+            break unless @nums.include?(num) && @board.board[letter][num] == '-'
         end
-        @valid_moves.pop unless capturable.include?(@board[letter][num])
+        @valid_moves.pop unless on_board?(letter + num) && capturable.include?(@board.board[letter][num])
     end
 
     def diagonal_moves_quadrant_one
         letter = @initial_pos[0]
         num = @initial_pos[1]
         capturable = white? ? @@black_pieces : @@white_pieces
-
-        while on_board?(letter + num) && @board[letter][num] == '-'
+        
+        loop do
             #gets previous letter in alphabet
             letter = (letter.ord - 1).chr
             num = num.to_i
             num -= 1
             num = num.to_s
-            @valid_moves.push(letter + num) if on_board?(letter + num)
+            @valid_moves.push(letter + num)
+
+            break unless on_board?(letter + num) && @board.board[letter][num] == '-'
         end
-        @valid_moves.pop unless capturable.include?(@board[letter][num])
+        @valid_moves.pop unless on_board?(letter + num) && capturable.include?(@board.board[letter][num])
     end
 
     def diagonal_moves_quadrant_two
@@ -79,15 +92,17 @@ class Queen < Piece
         num = @initial_pos[1]
         capturable = white? ? @@black_pieces : @@white_pieces
 
-        while on_board?(letter + num) && @board[letter][num] == '-'
+        loop do
             #gets previous letter in alphabet
             letter = (letter.ord + 1).chr
             num = num.to_i
             num -= 1
             num = num.to_s
-            @valid_moves.push(letter + num) if on_board?(letter + num)
+            @valid_moves.push(letter + num)
+
+            break unless on_board?(letter + num) && @board.board[letter][num] == '-'
         end
-        @valid_moves.pop unless capturable.include?(@board[letter][num])
+        @valid_moves.pop unless on_board?(letter + num) && capturable.include?(@board.board[letter][num])
     end
 
     def diagonal_moves_quadrant_three
@@ -95,13 +110,15 @@ class Queen < Piece
         num = @initial_pos[1]
         capturable = white? ? @@black_pieces : @@white_pieces
 
-        while on_board?(letter + num) && @board[letter][num] == '-'
+        loop do
             #gets next letter in alphabet
             letter = (letter.ord + 1).chr
             num.next!
-            @valid_moves.push(letter + num) if on_board?(letter + num)
+            @valid_moves.push(letter + num)
+
+            break unless on_board?(letter + num) && @board.board[letter][num] == '-'
         end
-        @valid_moves.pop unless capturable.include?(@board[letter][num])
+        @valid_moves.pop unless on_board?(letter + num) && capturable.include?(@board.board[letter][num])
     end
 
     #quadrant 4
@@ -110,12 +127,14 @@ class Queen < Piece
         num = @initial_pos[1]
         capturable = white? ? @@black_pieces : @@white_pieces
 
-        while on_board?(letter + num) && @board[letter][num] == '-'
-            #gets previous letter in alphabet
+        loop do
+            #gets next letter in alphabet
             letter = (letter.ord - 1).chr
             num.next!
-            @valid_moves.push(letter + num) if on_board?(letter + num)
+            @valid_moves.push(letter + num)
+
+            break unless on_board?(letter + num) && @board.board[letter][num] == '-'
         end
-        @valid_moves.pop unless capturable.include?(@board[letter][num])
+        @valid_moves.pop unless on_board?(letter + num) && capturable.include?(@board.board[letter][num])
     end
 end
