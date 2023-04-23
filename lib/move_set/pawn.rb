@@ -3,24 +3,19 @@ require_relative './piece.rb'
 class Pawn < Piece
 
     def find_valid_moves
+        transform = white? ? 1 : -1
         letter = @initial_pos[0]
         num = @initial_pos[1]
         color = white? ? 'white' : 'black'
         if on_start_pos?(num, color)
             #change the bottom loop l8
-            if color == 'white'
-                for n in 1..2
-                    num = num.next
-                    @valid_moves.push(letter + num) if @board.board[letter][num] == '-'
-                end
-            else
-                for n in 1..2
-                    num = (num.to_i - 1).to_s
-                    @valid_moves.push(letter + num) if @board.board[letter][num] == '-'
-                end
+            for n in 1..2
+                num = (num.to_i + transform).to_s
+                @valid_moves.push(letter + num) if @board.board[letter][num] == '-'
             end
-        elsif @board.board[letter][num.next] == '-'
-            @valid_moves.push(letter + num.next)
+        else 
+            num = (num.to_i + transform).to_s
+            @valid_moves.push(letter + num) if @board.board[letter][num] == '-'
         end
         able_to_capture?
         @valid_moves
