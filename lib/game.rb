@@ -24,23 +24,30 @@ class Game < Board
 
     def play
         until @game_over
+            @in_check = king_in_check?
             until @got_selections
                 display_turn(@current)
                 display_board(@board.board, @current)
                 @initial_pos = select_initial_pos
                 @new_pos = select_new_pos
+                @got_selections = will_king_be_protected? if @in_check
             end
-            board.modify_board(@initial_pos, @new_pos)
+            @board.modify_board(@initial_pos, @new_pos)
             @initial_pos = nil
             @new_pos = nil
             @got_selections = false
-            #draw?
-            @in_check = king_in_check?
+            king_in_checkmate?
+            @game_over = draw?
             @current == 'white' ? @current = 'black' : @current = 'white'
         end
-        #case @game_over.split('')
-        #when 
-        #end
+        case @game_over
+        when 'draw'
+            puts game_result('draw')
+        when 'stalemate'
+            puts game_result('stalemate')
+        else
+            puts game_result('winner', @game_over.capitalize)
+        end
         #check @game_over var
         #split @game_over (ie/ var will look like black_wins)
     end
@@ -56,8 +63,11 @@ class Game < Board
     end
 
     def valid_old_pos?(split_pos)
-        #check if initial position is on the board
+        king = @current == 'white' ? '♚' : '♔'
 
+        #if player is in check and they did not select their king, then return false
+
+        #check if initial position is on the board
         #check if split_pos corresponds to the current player (ie/ current = white and selected a white piece)
         #if old_pos does not match current_player's color, then callback select_old_pos
         if !position_on_board?(split_pos)
@@ -90,10 +100,9 @@ class Game < Board
         #check if piece is able to move into selected position (if new position is empty or opposing color is on it)
 
         #CHECK IF KING WILL BE IN CHECK IF THE PIECE IS MOVED
-        old_pos = @initial_pos
         piece = @board.get_piece(@initial_pos)
         color = @board.get_piece_color(@initial_pos)
-        possible_moves = valid_moves?(old_pos, piece, color, @board)
+        possible_moves = @board.valid_moves?(@initial_pos, piece, color, @board)
         
         if possible_moves.include?(new_pos)
             puts confirm_move('new_pos', piece, new_pos)
@@ -102,6 +111,9 @@ class Game < Board
         elsif new_pos == 'back'
             puts confirm_move('reselect')
             return true
+        elsif possible_moves.empty?
+            puts selection_error('unable_to_move')
+            return false
         else
             puts selection_error('invalid_new_pos')
             return false
@@ -109,34 +121,58 @@ class Game < Board
     end
 
     def king_in_check?
-        #checks if king is in check/checkmate
-        #if opposing king has no possible moves
+        #checks if current king is in check/checkmate
         #if checkmate then set @game_over var to @current
-        king = @current == 'white' ? '♔' : '♚'
+        king = @current == 'white' ? '♚' : '♔'
         position = @board.get_piece_position(king)
         color = @board.get_piece_color(position)
-        #possible_moves = @board.valid_moves?(position, king, color, @board)
 
         #check for threats
         #if no threats then return false, otherwise continue
         return false unless @board.check_threats(position, color, @board)
+        true
+    end
 
-        #if possible_moves.empty?
-            #check if any pieces can be moved to protect king
-            #if not possible then game over
-            #p 'check'
-            #@game_over = "#{@current}_wins" unless @board.able_to_protect?(@board.board, king)
-        #end
-        #true
-        false
+    def will_king_be_protected?
+        #if king in check, check if the player's move will protect king
+        @board.modify_board(@initial_pos, @new_pos)
+
+        king = @current == 'white' ? '♚' : '♔'
+        position = @board.get_piece_position(king)
+        color = @board.get_piece_color(position)
+
+        #check for threats
+        #if no threats then return false, otherwise continue
+        if @board.check_threats(position, color, @board)
+            puts selection_error('in_check')
+            @board.modify_board(@new_pos, @initial_pos)
+            return false
+        end
+        @board.modify_board(@new_pos, @initial_pos)
+        true
+    end
+
+    def king_in_checkmate?
+        #check if opp king is in checkmate
+        king = @current == 'white' ? '♔' : '♚'
+        pos= @board.get_piece_position(king)
+        color = @board.get_piece_color(pos)
+        possible_moves = @board.valid_moves?(pos, king, color, @board)
+
+         #if current king has no possible moves and player is unable to move a piece to block threat
+         #set @game_over to @current
+        @game_over = @current if @board.check_threats(pos, color, @board) && possible_moves.empty? && @board.unable_to_protect?(king, pos, color, @board)
     end
 
     def draw?
         #if there are only kings left, then set @gameover to 'draw'
         #if king cannot move and there are no threats, then set @gameover to 'draw'
-        king = @current == 'white' ? '♚' : '♔'
-        return 'draw' if @board.only_king?('♚', @board.board) && @board.only_king?('♔', @board.board)
-        return 'stalemate' if @board.stalemate?(pos, color, @board.board)
+        king = @current == 'white' ? '♔' : '♚'
+        pos = @board.get_piece_position(king)
+        color = @board.get_piece_color(pos)
+
+        return 'draw' if @board.only_king?('♚') && @board.only_king?('♔')
+        return 'stalemate' if @board.stalemate?(pos, color, @board)
         nil
     end
 
