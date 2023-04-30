@@ -36,28 +36,38 @@ module Display
     def get_player_move(msg, piece=nil)
         {
             'initial_pos' => "Enter the position of the piece that you want to move (ie. 'a1', 'b5', etc.)",
-            'new_pos' => "Enter the position you want to move #{piece} to"
+            'new_pos' => "\nEnter the position you want to move #{piece} to\nEnter 'back' if you want to move a different piece"
         }[msg]
     end
 
     def confirm_move(msg, piece=nil, pos=nil)
         {
-            'initial_pos' => "Selected #{piece} at '#{pos}'\n",
-            'new_pos' => "Moved #{piece} to #{pos}"
+            'initial_pos' => "Selected #{piece} at '#{pos}'",
+            'new_pos' => "Moved #{piece} to #{pos}",
+            'reselect' => "You entered 'back'\n"
         }[msg]
     end
 
     def selection_error(msg, current=nil)
         {
-            'invalid_color' => "Selected the wrong color, you are #{current}",
+            'invalid_color' => "Selected the wrong color, you are '#{current}'",
             'invalid_pos' => "The position you entered does not exist",
             'invalid_new_pos' => "You cannot move the piece there",
             'empty_pos' => 'The position you entered is empty',
-            'in_check' => 'You are in check!'
+            'in_check' => "You are in check!\nYou're move was not successful!",
+            'unable_to_move' => "You can't move this piece"
         }[msg]
     end
 
     def display_turn(current)
-        p "#{current.capitalize}'s turn"
+        puts "\n#{current.capitalize}'s turn"
+    end
+
+    def game_result(msg, current=nil)
+        {
+            'stalemate' => "Game over! It's a stalemate",
+            'draw' => "Draw! There are only kings  on the board",
+            'winner' => "Checkmate! #{current} wins!"
+        }[msg]
     end
 end
