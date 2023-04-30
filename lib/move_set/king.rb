@@ -6,7 +6,7 @@ class King < Piece
         #king can move in any direction, but only 1 square at a time
         #check if king will be in_check if the king moves there
         #check if king can castle - MAYBE DO THIS
-        transformations = [[-1,-1],[-1,1],[1,-1],[1,1]].freeze
+        transformations = [[-1,-1],[-1,1],[1,-1],[1,1],[0,1],[1,0],[-1,0],[0,-1]].freeze
 
         transformations.each do |t|
             letter = @initial_pos[0]
@@ -14,63 +14,83 @@ class King < Piece
             letter = (letter.ord + t[0]).chr
             num = (num + t[1]).to_s
             new_pos = letter + num
-            @valid_moves.push(new_pos) if on_board?(new_pos) && position_capturable?(new_pos) && no_threats?(new_pos)
+            @valid_moves.push(new_pos) if on_board?(new_pos) && position_capturable?(new_pos) && !threats?(new_pos)
         end
         @valid_moves
     end
 
-    def no_threats?(pos)
+    def threats?(pos)
         #will check for all diagonals and horizontals
-        return false if check_bishop_queen(pos) || check_rook_queen(pos) || check_pawn(pos) || check_knight(pos)
-        true
+        check_bishop_queen(pos) || check_rook_queen(pos) || check_pawn(pos) || check_knight(pos)
+    end
+
+    def threat_positions?(pos)
+        threats?(pos)
+        return @threat_positions
     end
 
     def check_bishop_queen(pos) #check diagonals + queen
         opp_bishop = white? ? @@black_pieces[2] : @@white_pieces[2]
         opp_queen = white? ? @@black_pieces[4] : @@white_pieces[4]
+        set = white? ? @@white_pieces : @@black_pieces
 
         letter = pos[0]
         num = pos[1]
-        count = 1
 
         #diagonal one
         loop do
-            letter = (letter.ord - count).chr
-            num = (num.to_i - count).to_s
-            break unless on_board?(letter + num) && @board.board[letter][num] == '-'
-            return true if @board.board[letter][num] == opp_bishop || @board.board[letter][num] == opp_queen
-
-            letter = pos[0]
-            num = pos[1]
-
-            letter = (letter.ord + count).chr
-            num = (num.to_i + count).to_s
-            break unless @letters.include?(letter) && @board.board[letter][num] == '-'
-            return true if @board.board[letter][num] == opp_bishop || @board.board[letter][num] == opp_queen
-
-            count += 1
+            letter = (letter.ord - 1).chr
+            num = (num.to_i - 1).to_s
+            #fix the break on loop
+            break unless on_board?(letter + num)
+            break if set.include?(@board.board[letter][num])
+            if @board.board[letter][num] == opp_bishop || @board.board[letter][num] == opp_queen
+                @threat_positions.push(letter + num) 
+                return true
+            end
         end
 
         letter = pos[0]
         num = pos[1]
-        count = 1
+
+        loop do
+            letter = (letter.ord + 1).chr
+            num = (num.to_i + 1).to_s
+            break unless on_board?(letter + num)
+            break if set.include?(@board.board[letter][num])
+            if @board.board[letter][num] == opp_bishop || @board.board[letter][num] == opp_queen
+                @threat_positions.push(letter + num) 
+                return true
+            end
+        end
+
+        letter = pos[0]
+        num = pos[1]
 
         #diagonal two
         loop do
-            letter = (letter.ord + count).chr
-            num = (num.to_i - count).to_s
-            break unless @letters.include?(letter) && @board.board[letter][num] == '-'
-            return true if @board.board[letter][num] == opp_bishop || @board.board[letter][num] == opp_queen
+            letter = (letter.ord + 1).chr
+            num = (num.to_i - 1).to_s
+            break unless on_board?(letter + num)
+            break if set.include?(@board.board[letter][num])
+            if @board.board[letter][num] == opp_bishop || @board.board[letter][num] == opp_queen
+                @threat_positions.push(letter + num) 
+                return true
+            end
+        end
 
-            letter = pos[0]
-            num = pos[1]
+        letter = pos[0]
+        num = pos[1]
 
-            letter = (letter.ord - count).chr
-            num = (num.to_i + count).to_s
-            break unless @letters.include?(letter) && @board.board[letter][num] == '-'
-            return true if @board.board[letter][num] == opp_bishop || @board.board[letter][num] == opp_queen
-
-            count += 1
+        loop do
+            letter = (letter.ord - 1).chr
+            num = (num.to_i + 1).to_s
+            break unless on_board?(letter + num)
+            break if set.include?(@board.board[letter][num])
+            if @board.board[letter][num] == opp_bishop || @board.board[letter][num] == opp_queen
+                @threat_positions.push(letter + num)
+                return true
+            end
         end
         false
     end
@@ -78,6 +98,7 @@ class King < Piece
     def check_rook_queen(pos) #vertical and horizontal + queen
         opp_rook = white? ? @@black_pieces[3] : @@white_pieces[3]
         opp_queen = white? ? @@black_pieces[4] : @@white_pieces[4]
+        set = white? ? @@white_pieces : @@black_pieces
 
         letter = pos[0]
         num = pos[1]
@@ -86,32 +107,58 @@ class King < Piece
         #checks horizontal
         loop do
             letter = (letter.ord - count).chr
-            break unless @letters.include?(letter) && @board.board[letter][num] == '-'
-            return true if @board.board[letter][num] == opp_rook || @board.board[letter][num] == opp_queen
-
-            letter = pos[0]
-
-            letter = (letter.ord + count).chr
-            break unless @letters.include?(letter) && @board.board[letter][num] == '-'
-            return true if @board.board[letter][num] == opp_rook || @board.board[letter][num] == opp_queen
+            break unless @letters.include?(letter)
+            break if set.include?(@board.board[letter][num])
+            if @board.board[letter][num] == opp_rook || @board.board[letter][num] == opp_queen
+                @threat_positions.push(letter + num)
+                return true
+            end
 
             count += 1
         end
 
-        count = 1
         letter = pos[0]
+        count = 1
+
+        loop do
+            letter = (letter.ord + count).chr
+            break unless @letters.include?(letter)
+            break if set.include?(@board.board[letter][num])
+            if @board.board[letter][num] == opp_rook || @board.board[letter][num] == opp_queen
+                @threat_positions.push(letter + num)
+                return true
+            end
+
+            count += 1
+        end
+
+        letter = pos[0]
+        count = 1
 
         #checks vertical
         loop do
             num = (num.to_i - count).to_s
-            break unless @letters.include?(letter) && @board.board[letter][num] == '-'
-            return true if @board.board[letter][num] == opp_rook || @board.board[letter][num] == opp_queen
+            break unless @nums.include?(letter)
+            break if set.include?(@board.board[letter][num])
+            if @board.board[letter][num] == opp_rook || @board.board[letter][num] == opp_queen
+                @threat_positions.push(letter + num)
+                return true
+            end
 
-            num = pos[1]
+            count += 1
+        end
 
+        num = pos[1]
+        count = 1
+
+        loop do
             num = (num.to_i + count).to_s
-            break unless @letters.include?(letter) && @board.board[letter][num] == '-'
-            return true if @board.board[letter][num] == opp_rook || @board.board[letter][num] == opp_queen
+            break unless @nums.include?(num)
+            break if set.include?(@board.board[letter][num])
+            if @board.board[letter][num] == opp_rook || @board.board[letter][num] == opp_queen
+                @threat_positions.push(letter + num)
+                return true
+            end
 
             count += 1
         end
@@ -128,7 +175,10 @@ class King < Piece
             letter = (letter.ord + t[0]).chr
             num = (num + t[1]).to_s
             new_pos = letter + num
-            return true if on_board?(new_pos) && @board.board[letter][num] == opp_pawn
+            if on_board?(new_pos) && @board.board[letter][num] == opp_pawn
+                @threat_positions.push(letter + num)
+                return true
+            end
         end
         false
     end
@@ -144,7 +194,10 @@ class King < Piece
             letter = (letter.ord + t[0]).chr
             num = (num + t[1]).to_s
             new_pos = letter + num
-            return true if on_board?(new_pos) && @board.board[letter][num] == opp_knight
+            if on_board?(new_pos) && @board.board[letter][num] == opp_knight
+                @threat_positions.push(letter + num)
+                return true
+            end
         end
         false
     end
