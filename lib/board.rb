@@ -36,18 +36,22 @@ class Board < Piece
     def set_initial_pos(letter, num)
         num == 1 || num == 2 ? color = 'white' : color = 'black'
         
-        return set_piece_color('pawn', color) if num == 2 || num == 7
+        return '-' if num == 2 || num == 7
+        #return set_piece_color('pawn', color) if num == 2 || num == 7
         return '-' if num > 2 && num < 7
         #replace names of pieces with images/emojis
         case letter
         when 'a', 'h'
             return set_piece_color('rook', color)
         when 'b', 'g'
-            return set_piece_color('knight', color)
+            return '-'
+            #return set_piece_color('knight', color)
         when 'c', 'f'
-            return set_piece_color('bishop', color)
+            return '-'
+            #return set_piece_color('bishop', color)
         when 'd'
-            return set_piece_color('queen', color)
+            return '-'
+            #return set_piece_color('queen', color)
         when 'e'
             return set_piece_color('king', color)
         end
@@ -88,10 +92,97 @@ class Board < Piece
         @board[pos[0]][pos[1]]
     end
 
+    def get_piece_position(piece)
+        #will be used to check if king is in check/checkmate
+        for letter in 'a'..'h' do
+            for num in '1'..'8' do
+                return letter + num if @board[letter][num] == piece
+            end
+        end
+    end
+
     def get_piece_color(pos)
         #gets color of selected piece
         piece = @board[pos[0]][pos[1]]
         @@white_pieces.include?(piece) ? 'white' : 'black'
+    end
+
+    def check_threats(pos, color, board)
+        King.new(board, pos, color).threats?(pos)
+    end
+
+    def get_piece_off_count(count, set)
+        piece_count = 1
+        for letter in 'a'..'h' do
+            for num in '1'..'8' do
+                if set.include?(@board[letter][num])
+                    return letter + num if piece_count == count
+                    piece_count += 1
+                end
+            end
+        end
+        nil
+    end
+
+    def unable_to_protect?(king, k_pos, color, board)
+        #check if any valid_moves of same set is able to move in between threat and king
+        #also check if any piece in the set can capture the threat without putting king in check
+        set = color == 'white' ? @@black_pieces : @@white_pieces
+        threat_positions = get_threats(k_pos, color, board)
+        threat_moves = []
+        #mock_board will be used to check if the king wll have threats after piece is moved
+        #possibility
+        for t_pos in threat_positions do
+            t_piece = get_piece(t_pos)
+            t_color = get_piece_color(t_pos)
+            threat_moves.concat(valid_moves?(t_pos, t_piece, t_color, board))
+        end
+
+        count = 1
+        while true
+            piece_pos = get_piece_off_count(count, set)
+            return true if piece_pos == nil
+            piece = get_piece(piece_pos)
+            piece_moves = valid_moves?(piece_pos, piece, color, board)
+            move = cross_check_moves(threat_positions, t_moves, piece_moves)
+            board.modify_board(piece_pos, move)
+            if !King.new(board, k_pos, color).find_valid_moves.empty?
+                board.modify_board(move, piece_pos)
+                return false
+            end
+            board.modify_board(move, piece_pos)
+            count += 1
+        end
+    end
+
+    def cross_check_moves(t_positions, t_moves, p_moves)
+        #see if any of the possible moves matchup (between same set vs opp set)
+        #or if same set can capture a pos of threat
+        return p_moves.select{|pos| t_positions.include?(pos)}[0] if p_moves.intersect?(t_positions)
+        return p_moves.select{|pos| t_moves.include?(pos)}[0] if p_moves.intersect?(t_moves)
+    end
+
+    def get_threats(pos, color, board)
+        #get threats of king
+        King.new(board, pos, color).threat_positions?(pos)
+    end
+
+    def stalemate?(pos, color, board)
+        piece = color == 'white' ? @@white_pieces[5] : @@black_pieces[5]
+
+        return true if valid_moves?(pos, piece, color, board).empty? && !check_threats(pos, color, board) && only_king?(piece)
+        false
+    end
+
+    def only_king?(king)
+        set = king == '♚' ? @@white_pieces : @@black_pieces
+        for letter in 'a'..'h' do
+            for num in '1'..'8' do
+                piece = @board[letter][num]
+                return false if set.include?(piece) && piece != king
+            end
+        end
+        true
     end
 
     def valid_moves?(pos, piece, color, board)
@@ -102,13 +193,13 @@ class Board < Piece
         when '♞', '♘'
             return Knight.new(board, pos, color).find_valid_moves
         when '♝', '♗'
-            initialize_piece = Bishop.new(@board, pos, color).find_valid_moves
+            return Bishop.new(board, pos, color).find_valid_moves
         when '♜', '♖'
-            initialize_piece = Rook.new(@board, pos, color).find_valid_moves
+            return Rook.new(board, pos, color).find_valid_moves
         when '♛', '♕'
-            initialize_piece = Queen.new(@board, pos, color).find_valid_moves
+            return Queen.new(board, pos, color).find_valid_moves
         when '♚', '♔'
-            initialize_piece = King.new(@board, pos, color).find_valid_moves
+            return King.new(board, pos, color).find_valid_moves
         end
     end
 end
