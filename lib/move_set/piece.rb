@@ -12,6 +12,8 @@ class Piece
         @letters = ('a'..'h').to_a
         @nums = ('1'..'8').to_a
         @valid_moves = []
+        #@threats will have the position of threat (ie. 'a1') - will be used only for King class
+        @threat_positions = []
     end
 
     def white?
