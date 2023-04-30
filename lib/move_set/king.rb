@@ -106,50 +106,41 @@ class King < Piece
 
         #checks horizontal
         loop do
-            letter = (letter.ord - count).chr
+            letter = (letter.ord - 1).chr
             break unless @letters.include?(letter)
             break if set.include?(@board.board[letter][num])
             if @board.board[letter][num] == opp_rook || @board.board[letter][num] == opp_queen
                 @threat_positions.push(letter + num)
                 return true
             end
-
-            count += 1
         end
 
         letter = pos[0]
-        count = 1
 
         loop do
-            letter = (letter.ord + count).chr
+            letter = (letter.ord + 1).chr
             break unless @letters.include?(letter)
             break if set.include?(@board.board[letter][num])
             if @board.board[letter][num] == opp_rook || @board.board[letter][num] == opp_queen
                 @threat_positions.push(letter + num)
                 return true
             end
-
-            count += 1
         end
 
         letter = pos[0]
-        count = 1
 
         #checks vertical
         loop do
-            num = (num.to_i - count).to_s
+            num = (num.to_i - 1).to_s
             break unless @nums.include?(letter)
             break if set.include?(@board.board[letter][num])
             if @board.board[letter][num] == opp_rook || @board.board[letter][num] == opp_queen
                 @threat_positions.push(letter + num)
                 return true
             end
-
-            count += 1
         end
 
         num = pos[1]
-        count = 1
 
         loop do
             num = (num.to_i + count).to_s
@@ -159,8 +150,6 @@ class King < Piece
                 @threat_positions.push(letter + num)
                 return true
             end
-
-            count += 1
         end
         false
     end
