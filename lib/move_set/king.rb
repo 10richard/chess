@@ -34,6 +34,8 @@ class King < Piece
         opp_queen = white? ? @@black_pieces[4] : @@white_pieces[4]
         set = white? ? @@white_pieces : @@black_pieces
 
+        @board.modify_board(@initial_pos, pos)
+
         letter = pos[0]
         num = pos[1]
 
@@ -46,6 +48,7 @@ class King < Piece
             break if set.include?(@board.board[letter][num])
             if @board.board[letter][num] == opp_bishop || @board.board[letter][num] == opp_queen
                 @threat_positions.push(letter + num) 
+                @board.modify_board(pos, @initial_pos)
                 return true
             end
         end
@@ -60,6 +63,7 @@ class King < Piece
             break if set.include?(@board.board[letter][num])
             if @board.board[letter][num] == opp_bishop || @board.board[letter][num] == opp_queen
                 @threat_positions.push(letter + num) 
+                @board.modify_board(pos, @initial_pos)
                 return true
             end
         end
@@ -75,6 +79,7 @@ class King < Piece
             break if set.include?(@board.board[letter][num])
             if @board.board[letter][num] == opp_bishop || @board.board[letter][num] == opp_queen
                 @threat_positions.push(letter + num) 
+                @board.modify_board(pos, @initial_pos)
                 return true
             end
         end
@@ -89,9 +94,11 @@ class King < Piece
             break if set.include?(@board.board[letter][num])
             if @board.board[letter][num] == opp_bishop || @board.board[letter][num] == opp_queen
                 @threat_positions.push(letter + num)
+                @board.modify_board(pos, @initial_pos)
                 return true
             end
         end
+        @board.modify_board(pos, @initial_pos)
         false
     end
 
@@ -100,10 +107,10 @@ class King < Piece
         opp_queen = white? ? @@black_pieces[4] : @@white_pieces[4]
         set = white? ? @@white_pieces : @@black_pieces
 
+        @board.modify_board(@initial_pos, pos)
+
         letter = pos[0]
         num = pos[1]
-        count = 1
-
         #checks horizontal
         loop do
             letter = (letter.ord - 1).chr
@@ -111,6 +118,7 @@ class King < Piece
             break if set.include?(@board.board[letter][num])
             if @board.board[letter][num] == opp_rook || @board.board[letter][num] == opp_queen
                 @threat_positions.push(letter + num)
+                @board.modify_board(pos, @initial_pos)
                 return true
             end
         end
@@ -123,6 +131,7 @@ class King < Piece
             break if set.include?(@board.board[letter][num])
             if @board.board[letter][num] == opp_rook || @board.board[letter][num] == opp_queen
                 @threat_positions.push(letter + num)
+                @board.modify_board(pos, @initial_pos)
                 return true
             end
         end
@@ -136,6 +145,7 @@ class King < Piece
             break if set.include?(@board.board[letter][num])
             if @board.board[letter][num] == opp_rook || @board.board[letter][num] == opp_queen
                 @threat_positions.push(letter + num)
+                @board.modify_board(pos, @initial_pos)
                 return true
             end
         end
@@ -143,14 +153,16 @@ class King < Piece
         num = pos[1]
 
         loop do
-            num = (num.to_i + count).to_s
+            num = (num.to_i + 1).to_s
             break unless @nums.include?(num)
             break if set.include?(@board.board[letter][num])
             if @board.board[letter][num] == opp_rook || @board.board[letter][num] == opp_queen
                 @threat_positions.push(letter + num)
+                @board.modify_board(pos, @initial_pos)
                 return true
             end
         end
+        @board.modify_board(pos, @initial_pos)
         false
     end
 
