@@ -33,13 +33,16 @@ class Game < Board
                 @got_selections = will_king_be_protected? if @in_check
             end
             @board.modify_board(@initial_pos, @new_pos)
+            transform_pawn?
             @initial_pos = nil
             @new_pos = nil
             @got_selections = false
-            king_in_checkmate?
             @game_over = draw?
+            king_in_checkmate?
             @current == 'white' ? @current = 'black' : @current = 'white'
         end
+        puts
+        display_board(@board.board, @current)
         case @game_over
         when 'draw'
             puts game_result('draw')
@@ -98,8 +101,6 @@ class Game < Board
         #check if new_pos is not off the board
         #check if new_pos is in valid_moves of the piece (Piece class)
         #check if piece is able to move into selected position (if new position is empty or opposing color is on it)
-
-        #CHECK IF KING WILL BE IN CHECK IF THE PIECE IS MOVED
         piece = @board.get_piece(@initial_pos)
         color = @board.get_piece_color(@initial_pos)
         possible_moves = @board.valid_moves?(@initial_pos, piece, color, @board)
@@ -117,6 +118,16 @@ class Game < Board
         else
             puts selection_error('invalid_new_pos')
             return false
+        end
+    end
+
+    def transform_pawn?
+        #checks if player can transform pawn
+        piece = @board.get_piece(@new_pos)
+        if @board.able_to_transform_pawn?(piece, @new_pos)
+            transform_pawn_to?
+            piece = gets.chomp.to_i
+            @board.transform_pawn(piece, @new_pos, @current)
         end
     end
 
@@ -157,11 +168,10 @@ class Game < Board
         king = @current == 'white' ? '♔' : '♚'
         pos= @board.get_piece_position(king)
         color = @board.get_piece_color(pos)
-        possible_moves = @board.valid_moves?(pos, king, color, @board)
 
          #if current king has no possible moves and player is unable to move a piece to block threat
          #set @game_over to @current
-        @game_over = @current if @board.check_threats(pos, color, @board) && possible_moves.empty? && @board.unable_to_protect?(king, pos, color, @board)
+        @game_over = @current if @board.check_threats(pos, color, @board) && @board.unable_to_protect?(king, pos, color, @board)
     end
 
     def draw?
