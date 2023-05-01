@@ -5,7 +5,6 @@ require_relative './move_set/knight.rb'
 require_relative './move_set/king.rb'
 require_relative './move_set/rook.rb'
 require_relative './move_set/queen.rb'
-
 class Board < Piece
 
     attr_accessor :board
