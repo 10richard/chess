@@ -48,6 +48,10 @@ module Display
         }[msg]
     end
 
+    def transform_pawn_to?
+        puts "Enter a number to transform the pawn?\n1 = Knight | 2 = Bishop | 3 = Rook | 4 = Queen"
+    end
+
     def selection_error(msg, current=nil)
         {
             'invalid_color' => "Selected the wrong color, you are '#{current}'",
