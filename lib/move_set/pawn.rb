@@ -40,10 +40,4 @@ class Pawn < Piece
             @valid_moves.push(letter + num) if on_board?(letter + num) && capturable.include?(@board.board[letter][num])
         end
     end
-
-    def able_to_transform?
-        #if black pawn reach number 1 then true
-        #if white pawn reach number 8 then true
-        #can transform to queen, rook, bishop, or knight
-    end
 end
