@@ -115,7 +115,7 @@ class Board < Piece
         piece_count = 1
         for letter in 'a'..'h' do
             for num in '1'..'8' do
-                if set.include?(@board[letter][num])
+                if set.include?(@board[letter][num]) && @board[letter][num] != set[5]
                     return letter + num if piece_count == count
                     piece_count += 1
                 end
@@ -144,13 +144,14 @@ class Board < Piece
             return true if piece_pos == nil
             piece = get_piece(piece_pos)
             piece_moves = valid_moves?(piece_pos, piece, color, board)
-            move = cross_check_moves(threat_positions, t_moves, piece_moves)
-            board.modify_board(piece_pos, move)
+            move = cross_check_moves(threat_positions, threat_moves, piece_moves)
+            board.modify_board(piece_pos, move) unless move == nil
             if !King.new(board, k_pos, color).find_valid_moves.empty?
-                board.modify_board(move, piece_pos)
+                board.modify_board(move, piece_pos) unless move == nil
+                p King.new(board, k_pos, color).find_valid_moves
                 return false
             end
-            board.modify_board(move, piece_pos)
+            board.modify_board(move, piece_pos) unless move == nil
             count += 1
         end
     end
@@ -160,6 +161,7 @@ class Board < Piece
         #or if same set can capture a pos of threat
         return p_moves.select{|pos| t_positions.include?(pos)}[0] if p_moves.intersect?(t_positions)
         return p_moves.select{|pos| t_moves.include?(pos)}[0] if p_moves.intersect?(t_moves)
+        nil
     end
 
     def get_threats(pos, color, board)
@@ -183,6 +185,20 @@ class Board < Piece
             end
         end
         true
+    end
+
+    def able_to_transform_pawn?(piece, pos)
+        color = get_piece_color(pos)
+        set = color == 'white' ? @@white_pieces : @@black_pieces
+        return true if set[0] == piece && pos[1] == '8'
+        return true if set[0] == piece && pos[1] == '1'
+        false
+    end
+
+    def transform_pawn(piece, pos, color)
+        set = color == 'white' ? @@white_pieces : @@black_pieces
+        transformation = set[piece]
+        @board[pos[0]][pos[1]] = transformation
     end
 
     def valid_moves?(pos, piece, color, board)
