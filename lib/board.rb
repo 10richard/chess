@@ -34,23 +34,19 @@ class Board < Piece
 
     def set_initial_pos(letter, num)
         num == 1 || num == 2 ? color = 'white' : color = 'black'
-        
-        return '-' if num == 2 || num == 7
-        #return set_piece_color('pawn', color) if num == 2 || num == 7
+
+        return set_piece_color('pawn', color) if num == 2 || num == 7
         return '-' if num > 2 && num < 7
         #replace names of pieces with images/emojis
         case letter
         when 'a', 'h'
             return set_piece_color('rook', color)
         when 'b', 'g'
-            return '-'
-            #return set_piece_color('knight', color)
+            return set_piece_color('knight', color)
         when 'c', 'f'
-            return '-'
-            #return set_piece_color('bishop', color)
+            return set_piece_color('bishop', color)
         when 'd'
-            return '-'
-            #return set_piece_color('queen', color)
+            return set_piece_color('queen', color)
         when 'e'
             return set_piece_color('king', color)
         end
